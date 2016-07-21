@@ -41,7 +41,6 @@ AI_Return cAI_Attack::Run()
 
 	bool bSucceedAttack = false;
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 攻击目标点
 	if (m_refIsAttackPos)
 	{
@@ -64,7 +63,6 @@ AI_Return cAI_Attack::Run()
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 攻击指定目标
 	iAI_Char* pDes = m_pChar->FindChar(m_refDesID);
 	if (NULL == pDes || pDes->IsDie())
@@ -74,7 +72,6 @@ AI_Return cAI_Attack::Run()
 	}
 
 	const bool bIsPlayer = m_pChar->IsPlayer();
-	// 如果是需要吟唱的技能，则不能不断地重复,查了下在必杀之前是采集，所以这里只针对角色,这样服务端就可以省下CPU
 	if (bIsPlayer && IsSpellSkill(m_refSkillTID))
 	{
 		// 采集等吟唱技能需要特殊处理
@@ -82,10 +79,6 @@ AI_Return cAI_Attack::Run()
 		{
 			m_pChar->Attack(m_refSkillTID, pDes);
 			return AI_Return::SwapUrgent;
-		}
-		else if (SKILL_TID_FaBaoChuZhan == m_refSkillTID)
-		{
-			return AI_Return::Continue;
 		}
 		else if (m_pChar->IsSpelling())
 		{
