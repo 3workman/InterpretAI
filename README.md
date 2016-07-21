@@ -1,5 +1,11 @@
 # InterpretAI
-基于解释器模式的AI框架
+##基于解释器模式的AI框架
+
+可以先看下"DesignMode\source\23Mode\Interpreter.h"，里面有个简单公式计算("a + b - c")例子
+
+LogicAI相当于“非终结符”，DoAI/BaseAI为“终结符”
+
+##简介
 
 1、此AI系统主要包含两个部分：基于虚函数的递归调用(见主逻辑模块)、AI切换(见m_vecNext处注释)
 
@@ -36,4 +42,3 @@
 		·行为树里的决策层，就是整个树结构，行为都封装在行为节点，或一棵小树里
 		
 	(4)相对而言行为树的Condition Node就得拉入外部数据
-	
