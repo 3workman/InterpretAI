@@ -3,6 +3,7 @@
 
 //走向某一点
 class cAI_Walk : public cAI{
+    Pool_Index_Define(cAI_Walk, 32)
 protected:
 	int m_nDesID = 0;
 	int m_nNpcID = 0;
@@ -19,7 +20,6 @@ protected:
 	StopCheck m_pCheckStopFun = NULL;
 public:
 	cAI_Walk(iAI_Char* p, bool bPlayerAutoKill);
-	Pool_Index_Define(cAI_Walk)
 
 	void SetDes(CPoint ptDes, int speed, int range, int id, int nSkill)
 	{

@@ -17,6 +17,8 @@ using namespace std;
 #define STATIC_ASSERT_ARRAY_LENGTH(arr, len) STATIC_ASSERT(sizeof(arr)/sizeof(arr[0])==(len), ___sizeErr##arr)
 #define STATIC_ASSERT_ARRAY_ARRAY(arrA, arrB) STATIC_ASSERT(sizeof(arrA)/sizeof(arrA[0])==sizeof(arrB)/sizeof(arrB[0]), ___sizeErr##arr)
 
+#define TimeNow_Msec GetTickCount()
+
 typedef unsigned char       byte;
 typedef unsigned short      WORD;
 typedef unsigned long       DWORD;

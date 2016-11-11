@@ -4,8 +4,6 @@
 #include "cAI_Sleep.h"
 #include <atltypes.h>
 
-Pool_Index_Ini(cAI_WalkAround, 32)
-
 bool cAI_WalkAround::SetAround(CPoint pt, int radius, int speed)
 {
 	ClearAI();

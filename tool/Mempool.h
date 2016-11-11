@@ -22,19 +22,12 @@ if ((o)->__precheck##i != CHECKNU || (o)->__poscheck##i != CHECKNU){\
 }
 
 class cPool_Page{
-	CRITICAL_SECTION m_csLock; /*互斥：临界区
-								1、临界区对象必须经过InitializeCriticalSection()的初始化后才能使用
-								2、EnterCriticalSection()/LeaveCriticalSection()标识/释放一个临界区
-								3、两函数之间的代码段即会互斥访问
-								4、LeaveCriticalSection()一定要被执行到，否则死锁，一直无法访问(不要在两函数直接return/break等打断)
-								5、最好封装一层(cLock.h)，保证两函数的并行*/
+	cMutex            m_csLock;
 	const size_t	  m_pageSize;
 	const size_t	  m_pageNum;
 	std::queue<void*> m_queue;
 public:
-	~cPool_Page() { ::DeleteCriticalSection(&m_csLock); }
 	cPool_Page(size_t pageSize, size_t pageNum) : m_pageSize(pageSize), m_pageNum(pageNum){
-		::InitializeCriticalSection(&m_csLock);
 		Double();
 	}
 	bool Double(){ // 可设置Double次数限制
@@ -70,23 +63,19 @@ class cPool_Index{ // 自动编号，便于管理(对象要含有m_index变量，记录其内存id)
 	std::queue<int> m_queue;
 public:
 	~cPool_Index(){}
-	cPool_Index(size_t num, bool bIni = true) : m_num(num), m_aObj(NULL){ if (bIni) IniPool(); }
-	bool IniPool()
-	{
-		if (m_aObj) return true;
+	cPool_Index(size_t num) : m_num(num){
 		m_aObj = (T**)malloc(m_num * sizeof(T*));
-		if (!m_aObj) return false;
+		if (!m_aObj) return;
 
 		//T* p = ::new T[m_num]; // 若类没operator new，就用全局的new(确保初始化)
 		T* p = (T*)malloc(m_num * sizeof(T));
-		if (!p) return false;	// 若类operator new，此处用new，会多次调用构造函数
+		if (!p) return;	         // 若类operator new，此处用new，会多次调用构造函数
 
 		for (size_t i = 0; i < m_num; ++i)
 		{
 			m_aObj[i] = p++;
 			m_queue.push(i);
 		}
-		return true;
 	}
 	bool Double(){
 		T** temp = (T**)malloc(m_num * 2 * sizeof(T*));
@@ -123,22 +112,48 @@ public:
 	}
 };
 #ifdef _DEBUG
-	#define Pool_Index_Define(T) \
-		static cPool_Index<T> m_alloc; /*静态变量，要在类外初始化（好容易忘记，LinkError查了好久都不知道）用Pool_Index_Ini初始化*/ \
+	#define Pool_Index_Define(T, size) \
+        static cPool_Index<T>& _Pool(){ static cPool_Index<T> pool(size); return pool; } \
+        public: \
 		int m_index; \
-		void* operator new(size_t /*size*/){ return m_alloc.Alloc(); }\
-		void* operator new(size_t /*size*/, const char* file, int line){ return m_alloc.Alloc(); }\
-		void operator delete(void* p, const char* file, int line){ return m_alloc.Dealloc((T*)p); }\
-		void operator delete(void* p, size_t) { return m_alloc.Dealloc((T*)p); }
+		void* operator new(size_t /*size*/){ return _Pool().Alloc(); }\
+		void* operator new(size_t /*size*/, const char* file, int line){ return _Pool().Alloc(); }\
+		void operator delete(void* p, const char* file, int line){ return _Pool().Dealloc((T*)p); }\
+		void operator delete(void* p, size_t) { return _Pool().Dealloc((T*)p); }
 #else
-	#define Pool_Index_Define(T) \
-		static cPool_Index<T> m_alloc; \
+	#define Pool_Index_Define(T, size) \
+        static cPool_Index<T>& _Pool(){ static cPool_Index<T> pool(size); return pool; } \
+        public: \
 		int m_index; \
-		void* operator new(size_t /*size*/){ return m_alloc.Alloc(); }\
-		void* operator new(size_t /*size*/, const char* file, int line){ return m_alloc.Alloc(); }\
-		void operator delete(void* p, size_t /*size*/){ return m_alloc.Dealloc((T*)p); }
+		void* operator new(size_t /*size*/){ return _Pool().Alloc(); }\
+		void* operator new(size_t /*size*/, const char* file, int line){ return _Pool().Alloc(); }\
+		void operator delete(void* p, size_t /*size*/){ return _Pool().Dealloc((T*)p); }
 #endif
-#define Pool_Index_Ini(T,num) cPool_Index<T> T::m_alloc(num); /*cpp中用：初始化静态内存池*/
+
+template <class T>
+class cPool_Obj{
+	cPool_Page	m_pool;
+public:
+	cPool_Obj(size_t num) : m_pool(sizeof(T), num){}
+	T* Alloc(){ return (T*)m_pool.Alloc(); }
+	void Dealloc(T* p){ m_pool.Dealloc(p); }
+};
+#ifdef _DEBUG
+#define Pool_Obj_Define(T, size) \
+        static cPool_Obj<T>& _Pool(){ static cPool_Obj<T> pool(size); return pool; } \
+        public: \
+		void* operator new(size_t /*size*/){ return _Pool().Alloc(); }\
+		void* operator new(size_t /*size*/, const char* file, int line){ return _Pool().Alloc(); }\
+		void operator delete(void* p, const char* file, int line){ return _Pool().Dealloc((T*)p); }\
+		void operator delete(void* p, size_t) { return _Pool().Dealloc((T*)p); }
+#else
+#define Pool_Obj_Define(T, size) \
+        static cPool_Obj<T>& _Pool(){ static cPool_Obj<T> pool(size); return pool; } \
+        public: \
+		void* operator new(size_t /*size*/){ return _Pool().Alloc(); }\
+		void* operator new(size_t /*size*/, const char* file, int line){ return _Pool().Alloc(); }\
+		void operator delete(void* p, size_t /*size*/){ return _Pool().Dealloc((T*)p); }
+#endif
 
 /************************************************************************/
 // 示例

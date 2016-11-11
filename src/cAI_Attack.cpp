@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "cAI_Attack.h"
 
-Pool_Index_Ini(cAI_Attack, 32) // ÄÚ´æ³Ø³õÊ¼»¯
-
 cAI_Attack::cAI_Attack(iAI_Char* p, bool bPlayerAutoKillNpc, int nSpeed) : cAI(p, AI_Type::Attack)
 , m_refDesID(p->GetAIAttackDes())
 , m_refSpeed(p->GetAISpeed())

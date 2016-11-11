@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "cAI_Walk.h"
 
-Pool_Index_Ini(cAI_Walk, 32)
-
 cAI_Walk::cAI_Walk(iAI_Char* p, bool bPlayerAutoKill) : cAI(p, AI_Type::Walk)
 , m_refSpeed(p->GetAISpeed())
 , m_refSkillTID(p->GetAISkillTID())

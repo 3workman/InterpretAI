@@ -2,8 +2,6 @@
 #include "cAI_WalkToChar.h"
 #include "cAI_Walk.h"
 
-Pool_Index_Ini(cAI_WalkToChar, 32)
-
 cAI_WalkToChar::cAI_WalkToChar(iAI_Char* p, bool bPlayerAutoKillNpc, int nSkill) : cAI(p, AI_Type::Walk_ToChar)
 , m_refSkillTID(p->GetAISkillTID())
 , m_bPlayerAutoKillNpc(bPlayerAutoKillNpc)

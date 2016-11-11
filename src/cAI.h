@@ -29,9 +29,6 @@
 #include <sysinfoapi.h> //系统时间(毫秒)GetTickCount
 #include "..\tool\Mempool.h"
 
-
-#define TimeNow_Msec GetTickCount()
-
 enum class AI_Return{ // 强类型枚举，不会将枚举常量暴露到外层作用域，也不会隐式转换为整形
 	None,
 	SwapUrgent,

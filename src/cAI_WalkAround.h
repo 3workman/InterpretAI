@@ -11,6 +11,7 @@
 #include "cAI.h"
 
 class cAI_WalkAround : public cAI{
+    Pool_Index_Define(cAI_WalkAround, 32)
 public:
 	cAI_WalkAround(iAI_Char* p) : cAI(p, AI_Type::Walk_Around)
 	{
@@ -19,7 +20,5 @@ public:
 		m_vecException.push_back(1);
 		m_vecException.push_back(0);
 	}
-	Pool_Index_Define(cAI_WalkAround)
-
 	bool SetAround(CPoint pt, int radius, int speed);
 };

@@ -2,6 +2,7 @@
 #include "cAI.h"
 
 class cAI_WalkToChar : public cAI{
+    Pool_Index_Define(cAI_WalkToChar, 32)
 	const bool m_bPlayerAutoKillNpc = false;
 	int&  m_refSkillTID;
 	int	  m_nDesID = 0;

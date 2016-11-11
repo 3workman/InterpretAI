@@ -2,6 +2,7 @@
 #include "cAI.h"
 
 class cAI_Attack : public cAI{
+    Pool_Index_Define(cAI_Attack, 32) // ÉùÃ÷ÄÚ´æ³Ø
 	const bool m_kIsPlayerAutoKillNpc;
 	int& m_refDesID;
 	int& m_refSpeed;

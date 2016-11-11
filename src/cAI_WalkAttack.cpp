@@ -5,8 +5,6 @@
 #include "cAI_Walk.h"
 #include <list>
 
-Pool_Index_Ini(cAI_WalkAttack, 32)
-
 cAI_WalkAttack::cAI_WalkAttack(iAI_Char* p, bool bCallPartner, bool bPlayerAutoKillNpc) : cAI(p, AI_Type::Walk_Attack)
 , m_bPlayerAutoKillNpc(bPlayerAutoKillNpc)
 , m_bCallPartner(bCallPartner)

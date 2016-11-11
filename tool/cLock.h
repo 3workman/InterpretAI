@@ -12,13 +12,22 @@
 #pragma once
 #include <windows.h>
 
-class cLock{
-	CRITICAL_SECTION& m_refLock; // 存引用节省判空操作(比指针)
+class cMutex {
+    CRITICAL_SECTION _cs;
 public:
-	cLock(CRITICAL_SECTION& lock) : m_refLock(lock) // 对象构建，进入临界区
-	{
-		::EnterCriticalSection(&m_refLock);
-	}
-	virtual ~cLock() { Unlock(); } // 对象析构，退出临界区
-	void Unlock() { ::LeaveCriticalSection(&m_refLock); }
+    cMutex(){ ::InitializeCriticalSection(&_cs); }
+    ~cMutex(){ ::DeleteCriticalSection(&_cs); }
+
+    __forceinline CRITICAL_SECTION* operator&(){ return &_cs; }
+    __forceinline operator CRITICAL_SECTION&(){ return _cs; }
+};
+
+class cLock {
+	CRITICAL_SECTION& _refLock; // 存引用节省判空操作(比指针)
+public:
+    cLock(cMutex& mutex) : _refLock(mutex) // 对象构建，进入临界区
+    {
+        ::EnterCriticalSection(&_refLock);
+    }
+    ~cLock() { ::LeaveCriticalSection(&_refLock); } // 对象析构，退出临界区
 };
