@@ -3,6 +3,28 @@
 * @ brief
 	1、预先申请一大块内存，按固定大小分页，页头地址给外界使用
 	2、多涉及operator new、operator delete
+
+* @ Notice
+    1、cPool_Index 内存池里的对象，有m_index数据，实为内存索引
+    2、被外界保存时，可能对象已经历消亡、复用，那么通过保存的idx找到的就是错误指针了
+    3、比如保存NpcID，那个Npc已经死亡，内存恰好被新Npc复用，此时通过NpcID找到的就不知道是啥了
+    4、可以在对象里加个自增变量，比如“uint16 autoId;”，同m_index合并成uint32，当唯一id。避免外界直接使用m_index
+
+    void MyClass::_CreateUniqueId() //仅在对象新建时调用，其它地方直接用 m_unique_id
+    {
+        static uint16 s_auto_id = 0;
+
+        m_unique_id = ((++s_auto_id) << 16) + m_index; //对象数16位就够用，不够的话封个64位的union吧
+    }
+    MyClass* MyClass::FindGroup(uint32 uniqueId)
+    {
+        int idx = uniqueId & 0xFFFF;
+
+        if (MyClass* ret = FindByIdx(idx))
+            if (ret->m_unique_id == uniqueId)
+                return ret;
+        return NULL;
+    }
 * @ author zhoumf
 * @ date 2014-11-21
 ************************************************************************/

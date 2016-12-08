@@ -11,7 +11,6 @@ class cAI_Attack : public cAI{
 	bool& m_refIsAttackPos;
 public:
 	cAI_Attack(iAI_Char* p, bool bPlayerAutoKillNpc, int nSpeed);
-	Pool_Index_Define(cAI_Attack) // ÉùÃ÷ÄÚ´æ³Ø
 
 	void SetAttack(iAI_Char* pChar, int nSkillTID)
 	{

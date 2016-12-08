@@ -8,7 +8,6 @@ class cAI_WalkToChar : public cAI{
 	int	  m_nDesID = 0;
 public:
 	cAI_WalkToChar(iAI_Char* p, bool bPlayerAutoKillNpc, int nSkill);
-	Pool_Index_Define(cAI_WalkToChar)
 
 	bool SetWalkTo(iAI_Char* p, int speed, int range);
 
