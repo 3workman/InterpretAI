@@ -52,18 +52,19 @@ public:
 	cPool_Page(size_t pageSize, size_t pageNum) : m_pageSize(pageSize), m_pageNum(pageNum){
 		Double();
 	}
-	bool Double(){ // 可设置Double次数限制
-		const size_t size = m_pageSize * m_pageNum; // 溢出风险：m_pageSize * m_pageNum
-		char* p = (char*)malloc(size); // 无初始化，外界要operator new或调用new(ptr)
-		if (!p) return false;
+    bool Double() // 可设置Double次数限制
+    {
+        // 无初始化，外界要operator new或调用new(ptr)
+        char* p = (char*)malloc(m_pageSize * m_pageNum); // 溢出风险：m_pageSize * m_pageNum
+        if (!p) return false;
 
-		for (size_t i = 0; i < size; ++i)
-		{
-			m_queue.push(p);
-			p += m_pageSize;
-		}
-		return true;
-	}
+        // 这里改写m_queue就不必加锁了，Alloc里已经加过，另外构造函数中不必加
+        for (size_t i = 0; i < m_pageNum; ++i) {
+            m_queue.push(p);
+            p += m_pageSize;
+        }
+        return true;
+    }
 	void* Alloc(){
 		cLock lock(m_csLock);
 		if (m_queue.empty() && !Double()) return NULL; // 空STL容器调front()、pop()直接宕机
